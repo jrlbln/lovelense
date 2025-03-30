@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "949474267126",
+    "project_id": "lovelense",
+    "storage_bucket": "lovelense.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:949474267126:android:9a0aa78a46448a550501d7",
+        "android_client_info": {
+          "package_name": "com.example.lovelense"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "949474267126-pkcbhr5mo7c62vlnke35ce7j9cd2hasb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lovelense",
+            "certificate_hash": "b09a2ee30018a44a4e42c884e9631509a10c5f9e"
+          }
+        },
+        {
+          "client_id": "949474267126-88mo9r6a9urps5pu76i4miiqcal89u8q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSflAlgE3ljpQ-jf0RrWzTHZiKVCajDzM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "949474267126-88mo9r6a9urps5pu76i4miiqcal89u8q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
