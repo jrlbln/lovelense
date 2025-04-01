@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/google_drive_service.dart';
+import '../../services/google_drive_service.dart';
 
 class AdminScreen extends StatefulWidget {
   const AdminScreen({super.key});
@@ -89,7 +89,7 @@ class _AdminScreenState extends State<AdminScreen> {
               )
             : Container(
                 color: Colors.grey[300],
-                child: const Icon(Icons.image, size: 40),
+                child: const Icon(Icons.image, size: 1),
               ),
       ),
     );

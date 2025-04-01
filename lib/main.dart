@@ -2,23 +2,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:camera/camera.dart';
-import 'package:lovelense/screens/admin_screen.dart';
-import 'package:lovelense/screens/camera_screen.dart';
-import 'dart:io' show Platform;
 import 'firebase_options.dart';
-import 'screens/auth_screen.dart';
+import 'screens/guests/auth_screen_mobile.dart';
+import 'screens/admin/auth_screen_web.dart';
+import 'screens/admin/admin_screen.dart';
+import 'screens/guests/camera_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
   await Firebase.initializeApp(options: firebaseOptions);
-
-  // Check for available cameras (only for Android)
-  if (!kIsWeb && Platform.isAndroid) {
-    await availableCameras();
-  }
 
   runApp(const MainApp());
 }
@@ -28,8 +22,11 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isWeb = kIsWeb;
+
     return MaterialApp(
       title: 'Wedding Camera',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         colorScheme: ColorScheme.fromSeed(
@@ -50,14 +47,18 @@ class MainApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasData) {
-            // Redirect based on platform
-            if (!kIsWeb && Platform.isAndroid) {
-              return const CameraScreen();
-            } else {
+            // Redirect authenticated users
+            final user = snapshot.data!;
+            if (user.email == 'admin@example.com') {
+              // Redirect admin users
               return const AdminScreen();
+            } else {
+              // Redirect regular users
+              return isWeb ? const AdminScreen() : const CameraScreen();
             }
           } else {
-            return const AuthScreen();
+            // Show authentication screen
+            return isWeb ? const AuthScreenWeb() : const AuthScreenMobile();
           }
         },
       ),

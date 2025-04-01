@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'camera_screen.dart';
-import 'admin_screen.dart';
+import 'guests/camera_screen.dart';
+import 'admin/admin_screen.dart';
 import '../services/google_drive_service.dart';
 
 class HomeScreen extends StatefulWidget {

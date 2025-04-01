@@ -19,6 +19,9 @@ dependencies:
   image: ^4.5.4
   camera: ^0.11.1
   intl: ^0.20.2
+  flutter_onboarding_slider: ^1.0.11
+  flutter_svg: ^2.0.17
+  google_fonts: ^6.2.1
 
 dev_dependencies:s:
   flutter_test:
@@ -30,4 +33,12 @@ flutter:
 
   assets:
     - assets/service_account.json
+
+    - assets/images/onboarding1.svg
+    - assets/images/onboarding2.svg
+    - assets/images/onboarding3.svg
+    - assets/images/onboarding4.svg
+    - assets/images/onboarding5.svg
+    - assets/images/google_icon.png
+    - assets/images/couple_image.png
 

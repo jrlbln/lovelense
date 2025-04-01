@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import '../services/google_drive_service.dart';
+import '../../services/google_drive_service.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
