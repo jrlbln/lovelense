@@ -1,18 +1,19 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
-import 'screens/guests/auth_screen_mobile.dart';
+import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/admin/auth_screen_web.dart';
-import 'screens/admin/admin_screen.dart';
-import 'screens/guests/camera_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
   await Firebase.initializeApp(options: firebaseOptions);
+
+  // Preload Google Fonts
+  GoogleFonts.config.allowRuntimeFetching = true;
 
   runApp(const MainApp());
 }
@@ -22,10 +23,8 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isWeb = kIsWeb;
-
     return MaterialApp(
-      title: 'Wedding Camera',
+      title: 'LoveLense',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -40,28 +39,9 @@ class MainApp extends StatelessWidget {
             foregroundColor: Colors.white,
           ),
         ),
+        textTheme: GoogleFonts.portLligatSlabTextTheme(),
       ),
-      home: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasData) {
-            // Redirect authenticated users
-            final user = snapshot.data!;
-            if (user.email == 'admin@example.com') {
-              // Redirect admin users
-              return const AdminScreen();
-            } else {
-              // Redirect regular users
-              return isWeb ? const AdminScreen() : const CameraScreen();
-            }
-          } else {
-            // Show authentication screen
-            return isWeb ? const AuthScreenWeb() : const AuthScreenMobile();
-          }
-        },
-      ),
+      home: kIsWeb ? const AuthScreenWeb() : const OnboardingScreen(),
     );
   }
 }

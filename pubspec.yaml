@@ -23,17 +23,22 @@ dependencies:
   flutter_svg: ^2.0.17
   google_fonts: ^6.2.1
 
-dev_dependencies:s:
+dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/LoveLenseIcon.png"
 
 flutter:
   uses-material-design: true
 
   assets:
     - assets/service_account.json
-
     - assets/images/onboarding1.svg
     - assets/images/onboarding2.svg
     - assets/images/onboarding3.svg
