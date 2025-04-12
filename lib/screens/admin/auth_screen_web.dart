@@ -92,7 +92,7 @@ class AuthScreenWeb extends StatelessWidget {
                   onPressed: () async {
                     final user = await AuthService.signInWithGoogle();
                     if (user != null) {
-                      print('Signed in as ${user.displayName}');
+                      Navigator.pushReplacementNamed(context, '/admin');
                     } else {
                       print('Sign-in failed');
                     }

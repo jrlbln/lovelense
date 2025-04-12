@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lovelense/screens/guests/social_screen.dart';
 import '../../widgets/google_button.dart';
 import '../../services/auth_service.dart';
 
-class AuthScreenMobile extends StatelessWidget {
+class AuthScreenMobile extends StatefulWidget {
   const AuthScreenMobile({super.key});
+
+  @override
+  _AuthScreenMobileState createState() => _AuthScreenMobileState();
+}
+
+class _AuthScreenMobileState extends State<AuthScreenMobile> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +83,11 @@ class AuthScreenMobile extends StatelessWidget {
                   onPressed: () async {
                     final user = await AuthService.signInWithGoogle();
                     if (user != null) {
-                      print('Signed in as ${user.displayName}');
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SocialScreen()),
+                      );
                     } else {
                       print('Sign-in failed');
                     }

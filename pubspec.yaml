@@ -11,11 +11,12 @@ dependencies:
     sdk: flutter
   firebase_core: ^3.12.1
   firebase_auth: ^5.4.0
+  firebase_database: ^11.3.5
   google_sign_in: ^6.2.2
   supabase_flutter: ^2.8.4
   googleapis: ^14.0.0
   googleapis_auth: ^2.0.0
-  cloud_firestore: ^5.6.5
+  cloud_firestore: ^5.6.6
   image: ^4.5.4
   camera: ^0.11.1
   intl: ^0.20.2
@@ -23,6 +24,7 @@ dependencies:
   flutter_svg: ^2.0.17
   google_fonts: ^6.2.1
   flutter_native_splash: ^2.4.6
+
 
 flutter_native_splash:
   background_image: assets/images/LoveLenseIcon_background.png

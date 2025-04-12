@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:lovelense/theme/app_colors.dart';
+import 'package:lovelense/widgets/bottom_navigation_bar.dart';
 import '../../services/google_drive_service.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -91,6 +93,21 @@ class _CameraScreenState extends State<CameraScreen> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: BottomNavigationBarWidget(
+        currentIndex: 1,
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushReplacementNamed(context, '/social');
+          } else if (index == 1) {
+            Navigator.pushReplacementNamed(context, '/camera');
+          } else if (index == 2) {
+            Navigator.pushReplacementNamed(context, '/captured_images');
+          }
+        },
+        backgroundColor: AppColors.secondary,
+        selectedItemColor: Theme.of(context).primaryColor,
+        unselectedItemColor: Theme.of(context).unselectedWidgetColor,
       ),
     );
   }

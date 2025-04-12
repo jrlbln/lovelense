@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lovelense/theme/app_colors.dart';
 import 'package:lovelense/theme/app_gradient.dart';
 import 'package:lovelense/widgets/primary_button.dart';
-import 'package:lovelense/screens/guests/auth_screen_mobile.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -105,11 +105,7 @@ class OnboardingScreen extends StatelessWidget {
               svgAsset: "assets/images/onboarding5.svg",
               buttonText: "Take your First Picture!",
               onButtonPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AuthScreenMobile()),
-                );
+                Navigator.pushReplacementNamed(context, '/auth_mobile');
               },
             ),
           ],
@@ -135,15 +131,15 @@ class OnboardingScreen extends StatelessWidget {
           Text(
             heading,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 5),
           Text(
             body,
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 18),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
@@ -156,6 +152,7 @@ class OnboardingScreen extends StatelessWidget {
           PrimaryButton(
             text: buttonText,
             onPressed: onButtonPressed,
+            fillColor: AppColors.secondary,
           ),
         ],
       ),
