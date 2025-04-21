@@ -12,7 +12,7 @@ class InputField extends StatelessWidget {
   final String? errorText;
 
   const InputField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.labelText,
     this.obscureText = false,
@@ -21,7 +21,7 @@ class InputField extends StatelessWidget {
     this.readOnly = false,
     this.onSubmitted,
     this.errorText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

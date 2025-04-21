@@ -131,47 +131,4 @@ class _AdminScreenState extends State<AdminScreen> {
       ),
     );
   }
-
-  void _showPhotoDetails(Map<String, dynamic> photo) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.8,
-          padding: const EdgeInsets.all(16),
-          child: Center(
-            child: photo['thumbnailLink'] != null
-                ? Image.network(
-                    photo['thumbnailLink'],
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Center(
-                        child: Icon(Icons.error, color: Colors.red, size: 50),
-                      );
-                    },
-                  )
-                : const Text('Image not available'),
-          ),
-        );
-      },
-    );
-  }
-
-  void _navigateToHome() {
-    Navigator.pushReplacementNamed(context, '/home');
-  }
 }

@@ -3,6 +3,7 @@ import '../../widgets/input_field.dart';
 import '../../widgets/google_button.dart';
 import '../../services/auth_service.dart';
 import '../../theme/app_colors.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthScreenWeb extends StatelessWidget {
   const AuthScreenWeb({super.key});
@@ -94,7 +95,9 @@ class AuthScreenWeb extends StatelessWidget {
                     if (user != null) {
                       Navigator.pushReplacementNamed(context, '/admin');
                     } else {
-                      print('Sign-in failed');
+                      if (kDebugMode) {
+                        print('Sign-in failed');
+                      }
                     }
                   },
                 ),

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lovelense/screens/guests/social_screen.dart';
 import '../../widgets/google_button.dart';
 import '../../services/auth_service.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthScreenMobile extends StatefulWidget {
   const AuthScreenMobile({super.key});
@@ -89,7 +90,9 @@ class _AuthScreenMobileState extends State<AuthScreenMobile> {
                             builder: (context) => const SocialScreen()),
                       );
                     } else {
-                      print('Sign-in failed');
+                      if (kDebugMode) {
+                        print('Sign-in failed');
+                      }
                     }
                   },
                 ),

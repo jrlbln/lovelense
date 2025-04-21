@@ -101,7 +101,10 @@ class _SocialScreenState extends State<SocialScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to Camera Screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CameraScreen()),
+          );
         },
         child: const Icon(Icons.camera_alt),
       ),

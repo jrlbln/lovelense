@@ -5,6 +5,7 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class GoogleDriveService {
   // Replace with your actual folder ID and ensure the account is authenticated
@@ -54,7 +55,9 @@ class GoogleDriveService {
 
       return response.id;
     } catch (e) {
-      print('Error uploading to Google Drive: $e');
+      if (kDebugMode) {
+        print('Error uploading to Google Drive: $e');
+      }
       return null;
     }
   }
@@ -148,7 +151,9 @@ class GoogleDriveService {
 
       return photos;
     } catch (e) {
-      print('Error listing Google Drive files: $e');
+      if (kDebugMode) {
+        print('Error listing Google Drive files: $e');
+      }
       return [];
     }
   }

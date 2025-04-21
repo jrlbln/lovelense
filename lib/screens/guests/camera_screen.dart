@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:lovelense/theme/app_colors.dart';
-import 'package:lovelense/widgets/bottom_navigation_bar.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import '../../services/google_drive_service.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -20,7 +20,15 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
+    _setLandscapeMode();
     _initializeCamera();
+  }
+
+  Future<void> _setLandscapeMode() async {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
   }
 
   Future<void> _initializeCamera() async {
@@ -28,21 +36,32 @@ class _CameraScreenState extends State<CameraScreen> {
       final cameras = await availableCameras();
       _controller = CameraController(
         cameras[0],
-        ResolutionPreset.medium,
+        ResolutionPreset.high,
+        enableAudio: false,
       );
       await _controller!.initialize();
       setState(() {
         _isInitialized = true;
       });
     } catch (e) {
-      print('Error initializing camera: $e');
+      if (kDebugMode) {
+        print('Error initializing camera: $e');
+      }
     }
   }
 
   @override
   void dispose() {
+    _resetOrientation();
     _controller?.dispose();
     super.dispose();
+  }
+
+  Future<void> _resetOrientation() async {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   Future<void> _takePhoto() async {
@@ -61,6 +80,7 @@ class _CameraScreenState extends State<CameraScreen> {
           const SnackBar(content: Text('Photo uploaded successfully!')),
         );
       }
+      Navigator.pushReplacementNamed(context, '/social');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
@@ -72,42 +92,81 @@ class _CameraScreenState extends State<CameraScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized) {
       return const Scaffold(
+        backgroundColor: Colors.black,
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
+    // Calculate aspect ratio of the screen
+    final screenSize = MediaQuery.of(context).size;
+
+    // Calculate aspect ratio of the camera
+    final cameraWidth = _controller!.value.previewSize!.height;
+    final cameraHeight = _controller!.value.previewSize!.width;
+    final cameraAspectRatio = cameraWidth / cameraHeight;
+
+    // Determine the overlay width based on the aspect ratio of your overlay image (3900x2400)
+    final overlayAspectRatio = 3900 / 2400;
+    final overlayWidth = screenSize.height * overlayAspectRatio;
+
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
+      body: Row(
         children: [
-          CameraPreview(_controller!),
-          Positioned(
-            bottom: 20,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: FloatingActionButton(
-                onPressed: _takePhoto,
-                child: const Icon(Icons.camera_alt),
+          // Camera preview and overlay container
+          SizedBox(
+            width: overlayWidth,
+            height: screenSize.height,
+            child: Stack(
+              children: [
+                // Camera Preview
+                Positioned.fill(
+                  child: AspectRatio(
+                    aspectRatio: cameraAspectRatio,
+                    child: CameraPreview(_controller!),
+                  ),
+                ),
+                // Overlay Image
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/CameraOverlay.png',
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Right side black space with centered shutter button
+          Expanded(
+            child: Container(
+              color: Colors.black,
+              child: Center(
+                child: GestureDetector(
+                  onTap: _takePhoto,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 4),
+                      color: Colors.transparent,
+                    ),
+                    child: Center(
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: BottomNavigationBarWidget(
-        currentIndex: 1,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushReplacementNamed(context, '/social');
-          } else if (index == 1) {
-            Navigator.pushReplacementNamed(context, '/camera');
-          } else if (index == 2) {
-            Navigator.pushReplacementNamed(context, '/captured_images');
-          }
-        },
-        backgroundColor: AppColors.secondary,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Theme.of(context).unselectedWidgetColor,
       ),
     );
   }
