@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/admin/auth_screen_web.dart';
@@ -21,7 +22,7 @@ void main() async {
   // Preload Google Fonts
   GoogleFonts.config.allowRuntimeFetching = true;
 
-  runApp(const MainApp());
+  runApp(const ProviderScope(child: MainApp()));
 }
 
 // Define a centralized route map
