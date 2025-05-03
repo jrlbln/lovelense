@@ -27,7 +27,9 @@ class GoogleDriveService {
   }
 
   // Upload an image to Google Drive
-  Future<String?> uploadImage(File imageFile, String fileName) async {
+  // Added parameter to control whether shots should be decremented internally
+  Future<String?> uploadImage(File imageFile, String fileName,
+      {bool shouldDecrementShots = true}) async {
     try {
       final client = await _getAuthenticatedClient();
       final driveApi = drive.DriveApi(client);
@@ -50,8 +52,10 @@ class GoogleDriveService {
       // Store metadata in Firestore
       await _storePhotoMetadata(response.id!, fileName);
 
-      // Decrement remaining shots
-      await _decrementRemainingShots();
+      // Only decrement shots if the flag is true (avoiding double decrement)
+      if (shouldDecrementShots) {
+        await _decrementRemainingShots();
+      }
 
       return response.id;
     } catch (e) {
@@ -101,7 +105,6 @@ class GoogleDriveService {
     return doc.data()?['remainingShots'] ?? 0;
   }
 
-  // Decrement remaining shots
   Future<void> _decrementRemainingShots() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -110,6 +113,11 @@ class GoogleDriveService {
         .collection('users')
         .doc(user.uid)
         .update({'remainingShots': FieldValue.increment(-1)});
+  }
+
+  // Public method to decrement shots (called from CameraScreen)
+  Future<void> decrementRemainingShots() async {
+    await _decrementRemainingShots();
   }
 
   // List all wedding photos (for admin)

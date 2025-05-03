@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import '../../services/google_drive_service.dart';
+import 'package:lovelense/screens/guests/social_screen.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -15,6 +17,8 @@ class CameraScreen extends StatefulWidget {
 class _CameraScreenState extends State<CameraScreen> {
   CameraController? _controller;
   bool _isInitialized = false;
+  bool _isUploading = false; // Track upload state
+  int _remainingShots = 0; // Track remaining shots
   final GoogleDriveService _driveService = GoogleDriveService();
 
   @override
@@ -22,6 +26,7 @@ class _CameraScreenState extends State<CameraScreen> {
     super.initState();
     _setLandscapeMode();
     _initializeCamera();
+    _loadRemainingShots(); // Load remaining shots on init
   }
 
   Future<void> _setLandscapeMode() async {
@@ -50,6 +55,13 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
+  Future<void> _loadRemainingShots() async {
+    final shots = await _driveService.getRemainingShots();
+    setState(() {
+      _remainingShots = shots;
+    });
+  }
+
   @override
   void dispose() {
     _resetOrientation();
@@ -65,26 +77,61 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _takePhoto() async {
-    if (_controller == null || !_controller!.value.isInitialized) return;
+    if (_controller == null ||
+        !_controller!.value.isInitialized ||
+        _isUploading) return;
+
+    setState(() {
+      _isUploading = true;
+    });
 
     try {
+      // Pause the camera preview immediately
+      await _controller!.pausePreview();
+
       final XFile photo = await _controller!.takePicture();
       final file = File(photo.path);
 
       // Upload to Google Drive
       final fileName = 'photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final fileId = await _driveService.uploadImage(file, fileName);
+
+      // UPDATED: We're now passing a flag to prevent double decrement
+      final fileId = await _driveService.uploadImage(
+        file,
+        fileName,
+        shouldDecrementShots: false,
+      );
 
       if (fileId != null) {
+        await _driveService.decrementRemainingShots();
+        await _loadRemainingShots();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Photo uploaded successfully!')),
         );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const SocialScreen()),
+        );
       }
-      Navigator.pushReplacementNamed(context, '/social');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
+
+      // Make sure this is called regardless of success or failure
+      try {
+        if (_controller?.value.isInitialized ?? false) {
+          await _controller!.resumePreview();
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Error resuming camera preview: $e');
+        }
+      }
     }
   }
 
@@ -97,15 +144,10 @@ class _CameraScreenState extends State<CameraScreen> {
       );
     }
 
-    // Calculate aspect ratio of the screen
     final screenSize = MediaQuery.of(context).size;
-
-    // Calculate aspect ratio of the camera
     final cameraWidth = _controller!.value.previewSize!.height;
     final cameraHeight = _controller!.value.previewSize!.width;
     final cameraAspectRatio = cameraWidth / cameraHeight;
-
-    // Determine the overlay width based on the aspect ratio of your overlay image (3900x2400)
     final overlayAspectRatio = 3900 / 2400;
     final overlayWidth = screenSize.height * overlayAspectRatio;
 
@@ -113,55 +155,66 @@ class _CameraScreenState extends State<CameraScreen> {
       backgroundColor: Colors.black,
       body: Row(
         children: [
-          // Camera preview and overlay container
           SizedBox(
             width: overlayWidth,
             height: screenSize.height,
             child: Stack(
               children: [
-                // Camera Preview
                 Positioned.fill(
                   child: AspectRatio(
                     aspectRatio: cameraAspectRatio,
                     child: CameraPreview(_controller!),
                   ),
                 ),
-                // Overlay Image
-                Positioned.fill(
-                  child: Image.asset(
-                    'assets/images/CameraOverlay.png',
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                // Positioned.fill(
+                //   child: Image.asset(
+                //     'assets/images/CameraOverlay.png',
+                //     fit: BoxFit.cover,
+                //   ),
+                // ),
               ],
             ),
           ),
-          // Right side black space with centered shutter button
           Expanded(
             child: Container(
               color: Colors.black,
               child: Center(
-                child: GestureDetector(
-                  onTap: _takePhoto,
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 4),
-                      color: Colors.transparent,
-                    ),
-                    child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: _takePhoto,
                       child: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: const BoxDecoration(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white,
+                          border: Border.all(color: Colors.white, width: 4),
+                          color: Colors.transparent,
+                        ),
+                        child: Center(
+                          child: _isUploading
+                              ? LoadingAnimationWidget.staggeredDotsWave(
+                                  color: Colors.white,
+                                  size: 40,
+                                )
+                              : Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Remaining Shots: $_remainingShots',
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
                 ),
               ),
             ),
